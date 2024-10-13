@@ -1,0 +1,81 @@
+---
+- name: Install packages
+  become: true
+  ansible.builtin.apt:
+    pkg:
+      - code-oss
+      - htop
+      - amass
+      - subfinder
+      - assetfinder
+      - ffuf
+      - gobuster
+      - dirsearch
+      - sublist3r
+      - remmina
+      - sshpass
+
+- name: Add .local/bin to zshrc $PATH
+  ansible.builtin.lineinfile:
+    path: "{{ kali_home }}/.zshrc"
+    line: export PATH="$PATH:{{ kali_home }}/.local/bin"
+
+- name: Add .local/bin to bashrc $PATH
+  ansible.builtin.lineinfile:
+    path: "{{ kali_home }}/.bashrc"
+    line: export PATH="$PATH:{{ kali_home }}/.local/bin"
+
+- name: Fix user-dirs.dirs
+  ansible.builtin.template:
+    src: user-dirs.dirs.j2
+    dest: "{{ kali_home }}/.config/user-dirs.dirs"
+    mode: '0600'
+
+- name: Add user-dirs.conf
+  ansible.builtin.template:
+    src: user-dirs.conf.j2
+    dest: "{{ kali_home }}/.config/user-dirs.conf"
+    mode: '0600'
+
+- name: Remove unnecessary directories
+  ansible.builtin.file:
+    state: absent
+    path: "{{ kali_home }}/{{ item }}"
+  with_items:
+    - Desktop
+    - Music
+    - Pictures
+    - Public
+    - Templates
+    - Videos
+
+- name: Remove unnecessary directories - twice over
+  ansible.builtin.file:
+    state: absent
+    path: "{{ kali_home }}/{{ item }}"
+  with_items:
+    - Desktop
+    - Music
+    - Pictures
+    - Public
+    - Templates
+    - Videos
+
+- name: Change ownership of /opt to kali
+  become: yes
+  ansible.builtin.file:
+    state: directory
+    path: /opt
+    group: kali
+    owner: kali
+
+- name: install vimrc
+  ansible.builtin.template:
+    src: vimrc.j2
+    dest: "{{ kali_home }}/.vimrc"
+
+- name: gunzip rockyou
+  become: true
+  ansible.builtin.command:
+    cmd: gunzip /usr/share/wordlists/rockyou.txt.gz
+    creates: /usr/share/wordlists/rockyou.txt

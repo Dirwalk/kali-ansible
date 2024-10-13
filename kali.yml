@@ -1,0 +1,17 @@
+---
+- name: Kali workstation deployment
+  hosts: localhost
+  connection: local
+  vars_files:
+    - group_vars/kali.yml
+  roles:
+    - apt
+    - kali
+    - xfce
+    - helpers
+    - mullvad
+    - docker
+    - chrome 
+    - go-tools
+    - autorecon
+    - rustscan

@@ -1,0 +1,15 @@
+---
+- name: pull rustscan docker image
+  become: true
+  community.docker.docker_image:
+    name: rustscan/rustscan
+    source: pull
+
+- name: add wrapper script
+  become: true
+  ansible.builtin.template:
+    src: rustscan.j2
+    dest: "/usr/local/bin/rustscan"
+    owner: root
+    group: root
+    mode: '0755'
